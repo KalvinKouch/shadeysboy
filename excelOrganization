@@ -1,0 +1,397 @@
+package excel;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import javax.swing.UIManager;
+
+import org.apache.commons.codec.binary.Hex;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook; 
+
+
+public class excelOrganization {
+	Object[][]gamblerArray = {};
+    Object[][]gamblerArrayInternational = {};
+    public static void main (String[] args) {
+
+    	// makes the manager look nice
+    	try {
+    		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    	} catch (Exception e) {
+    		
+    	}    		
+    	StartingGUI gui = new StartingGUI();
+    	
+        		            
+    }    
+    public void excelValue(File csvFile) throws Exception {
+
+    	
+
+    		  GamblerStoreValue store = new GamblerStoreValue();
+    		  gamblerArray = store.getGamblerStoreDomestic(csvFile);
+    		  gamblerArrayInternational = store.getGamblerStoreInternational(csvFile);
+    		  
+        }
+    
+    public void exportValues(String fileName, String fileArea) throws Exception {
+        XSSFCellStyle style;
+        XSSFCellStyle style1;
+        XSSFCellStyle style2;
+        XSSFCellStyle style3;
+        XSSFCellStyle style4;
+        XSSFCellStyle style5;
+        XSSFCellStyle style6;
+        XSSFCellStyle style7;
+    	GamblerGUI complete = new GamblerGUI();
+    	
+    	String nameArea = fileArea + "\\\\" + fileName  + ".xlsx";
+    	 
+    	 XSSFWorkbook workbook = new XSSFWorkbook();
+    	 GamblerStyle setup = new GamblerStyle(workbook);
+    	 style = setup.getGamblerWhite();
+    	 style1 = setup.getGamblerBlue();
+    	 style2 = setup.getGamblerGreen();
+    	 style3 = setup.getGamblerGreyBold1();
+    	 style4 = setup.getGamblerGreyBold2();
+    	 style5 = setup.getGamblerGrey1();
+    	 style6 = setup.getGamblerGrey2();
+    	 style7 = setup.getGamblerGrey3();
+    	 
+         XSSFSheet sheet1 = workbook.createSheet("Domestic"); 
+         XSSFSheet sheet2 = workbook.createSheet("International"); 
+         // Setting Background color  
+         
+         int rowCount = 0;
+         for (Object[] layout : gamblerArray) {
+
+             Row row1 = sheet1.createRow(rowCount);
+             int columnCount = 0;
+             //if it is the first row then it will give it color and place the title of the information
+             if(rowCount == 0)
+             { 
+            	 columnCount = 0;
+            	 //goes through each of the row
+                 for (Object area : layout) {
+                	 //sets column to the size of the information in the column
+                     Cell cell1 = row1.createCell(columnCount);
+                   //goes through each column
+                     if (area instanceof String) {	
+                    	 cell1.setCellValue((String) area); 
+                    	 sheet1.autoSizeColumn(columnCount);
+                    	 //colors the column grey and dark grey
+                    	 
+                    	 if(columnCount > 10)
+                    	 {
+                    		 if(columnCount % 2 == 1)
+                    		 {        
+                             cell1.setCellStyle(style3);
+                    		 }
+                    		 else 
+                    		 {
+                    	     cell1.setCellStyle(style4);                    			                     			 
+                    		 }
+                    	 }
+                    	                     	 //will just leave the blue otherwise
+                    	 else
+                         cell1.setCellStyle(style1);
+
+
+                     } else if (area instanceof Integer) {
+                    	 //does the same as string code
+                    	 cell1.setCellValue((Integer) area);  
+                    	 sheet1.autoSizeColumn(columnCount);
+                    	 if(columnCount > 11)
+                    	 {                    		 
+                    		 if(columnCount % 2 == 1)                    			 
+                    		 {
+                    			 
+                             cell1.setCellStyle(style3);
+                			 
+                    		 }
+                    		 else 
+                    		 {
+                    	     cell1.setCellStyle(style4);
+                    			 
+                    		 }
+                    	 }
+                    	
+                    	 else
+                         cell1.setCellStyle(style1);
+
+                    
+                     } 
+                     
+                     columnCount++;
+             }
+                 
+            }
+             else {
+             columnCount = 0;
+             
+             for (Object area : layout) {
+
+            	 
+                 Cell cell1 = row1.createCell(columnCount);
+                 if (area instanceof String) {	
+                     cell1.setCellValue((String) area);
+                     sheet1.autoSizeColumn(columnCount);
+                     if(columnCount == 10)  
+                     cell1.setCellStyle(style2); 
+                     else if(columnCount < 11 && rowCount % 2 == 0)
+                     {
+                    	 
+                    	 cell1.setCellStyle(style7);
+                     }
+                     else
+                    	 if(columnCount > 10)
+                    	 {
+                    		
+                    		 if(columnCount % 2 == 1)
+                    		 {
+                             cell1.setCellStyle(style5);
+                			 
+                    		 }
+                    		 else 
+                    		 {
+                    		 cell1.setCellStyle(style6);
+                    			 
+                    		 }
+                    	 }
+                    	 else
+                         cell1.setCellStyle(style);
+                
+                     
+                 } else if (area instanceof Integer) {
+                	 cell1.setCellValue((Integer) area); 
+                	 sheet1.autoSizeColumn(columnCount);
+                	 if(columnCount == 10)  
+                	 {
+                	 cell1.setCellStyle(style2); 
+                	 }
+                	 else if(columnCount < 11 && rowCount % 2 == 0)
+                     {
+                    	 cell1.setCellStyle(style7);
+                     }
+                	 else
+                		 if(columnCount > 10)
+                    	 {
+                			
+                    		 if(columnCount % 2 == 0)
+                    		 {
+                             cell1.setCellStyle(style5);
+                			 
+                    		 }
+                    		 else 
+                    		 {
+                    		 cell1.setCellStyle(style6);
+                    			 
+                    		 }
+                    	 }
+                    	 else
+                         cell1.setCellStyle(style);
+                	 
+                 }
+                 columnCount++;
+                 
+             }    
+            }
+             rowCount++;
+             try (FileOutputStream outputStream = new FileOutputStream(nameArea)) {
+                 workbook.write(outputStream);
+             }
+         
+        }
+         //-----------------------------------------------------------------------------------------------------
+        rowCount = 0;
+         for (Object[] format : gamblerArrayInternational) {
+       	  int columnCount = 0;
+            Row row2 = sheet2.createRow(rowCount);
+           
+            //if it is the first row then it will give it color and place the title of the information
+            if(rowCount == 0)
+            {
+           	 
+           	 
+           	 //goes through each of the row
+                for (Object field : format) {
+               	 //sets column to the size of the information in the column
+          
+                    Cell cell2 = row2.createCell(columnCount);
+                  //goes through each column
+                    if (field instanceof String) {	
+                   	 
+                   	 
+                   	 cell2.setCellValue((String) field); 
+                   	sheet2.autoSizeColumn(columnCount);
+                   	 //colors the column grey and dark grey
+                   	 if(columnCount > 10)
+                   	 {
+
+
+                   		 if(columnCount % 2 == 1)
+                   		 {
+                   			 
+                            cell2.setCellStyle(style3);
+                   		 }
+                   		 else 
+                   		 {
+                   	     cell2.setCellStyle(style4);
+
+                   			 
+                   			 
+                   		 }
+                   	 }
+                   	 //will just leave the blue otherwise
+                   	 else
+                        cell2.setCellStyle(style1);
+
+
+                         
+                    } else if (field instanceof Integer) {
+                   	 
+                   	 //does the same as string code
+                   	 cell2.setCellValue((Integer) field);   
+                   	sheet2.autoSizeColumn(columnCount);
+                   	 if(columnCount > 11)
+                   	 {
+                   		 
+                   		 if(columnCount % 2 == 1)
+                   			 
+                   		 {
+                            cell2.setCellStyle(style3);
+               			 
+                   		 }
+                   		 else 
+                   		 {
+                   	     cell2.setCellStyle(style4);
+                   			 
+                   		 }
+                   	 }
+                   	 else
+                        cell2.setCellStyle(style1);
+
+                    } 
+                  
+                   columnCount++; 
+            }
+           }
+            else {
+            columnCount = 0;
+
+            for (Object field : format) {
+           	 
+                Cell cell2 = row2.createCell(columnCount);
+
+                if (field instanceof String) {	
+                    cell2.setCellValue((String) field);
+                    sheet2.autoSizeColumn(columnCount);
+                    if(columnCount == 10)  
+                    cell2.setCellStyle(style2); 
+                    else if(columnCount < 11 && rowCount % 2 == 0)
+                    {
+                   	 cell2.setCellStyle(style7);
+                    }
+                    else
+                   	 if(columnCount > 10)
+                   	 {
+                   		
+                   		 if(columnCount % 2 == 1)
+                   		 {
+                            cell2.setCellStyle(style5);
+               			 
+                   		 }
+                   		 else 
+                   		 {
+                   		 cell2.setCellStyle(style6);
+                   			 
+                   		 }
+                   	 }
+                   	 else
+                        cell2.setCellStyle(style);
+                    sheet2.autoSizeColumn(columnCount);
+                    
+                } else if (field instanceof Integer) {
+
+               	 cell2.setCellValue((Integer) field); 
+               	sheet2.autoSizeColumn(columnCount);
+               	 if(columnCount == 10)  
+               	 {
+               	 cell2.setCellStyle(style2); 
+               	 }
+               	 else if(columnCount < 11 && rowCount % 2 == 0)
+                    {
+                   	 cell2.setCellStyle(style7);
+                    }
+               	 else
+               		 if(columnCount > 10)
+                   	 {
+               			
+                   		 if(columnCount % 2 == 1)
+                   		 {
+                            cell2.setCellStyle(style5);
+               			 
+                   		 }
+                   		 else 
+                   		 {
+                   		 cell2.setCellStyle(style6);
+                   			 
+                   		 }
+                   	 }
+                   	 else
+                        cell2.setCellStyle(style);
+                        
+                }
+               columnCount++;
+            }    
+           }
+            rowCount++;
+            try (FileOutputStream outputStream = new FileOutputStream(nameArea)) {
+            workbook.write(outputStream);
+
+        } 
+        
+       }
+         
+         workbook.close();
+         complete.exportComplete();
+     }
+         
+ 
+
+
+public String addBackslash(String fileArea)
+{
+	
+	int length = fileArea.length();
+    char[] path = fileArea.toCharArray();
+    String filePath = "";
+ //finds where \ and adds another \
+ for(int a = 0; a < length; a++)
+ 		{
+	  if(path[a] == ('\\')) {
+		  
+		 filePath = filePath + '\\';
+		 
+	  	}
+	  filePath = filePath + path[a]; 
+	  
+ 		}
+	return filePath;
+}
+
+}
+
+	
+
+  
